@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>keycloak-promise example client</title>
+        <script type="text/javascript" src="http://localhost:8080/auth/js/keycloak.js"></script>
+        <script type="text/javascript" src="keycloak-promise.js"></script>
+        <script type="text/javascript">
+var successHandler = function(result) {
+    console.log(result);
+    document.getElementById('results').value += JSON.stringify(result) + "\n";
+}
+var errorHandler = function(error) {
+    console.log(error);
+    document.getElementById('errors').value += JSON.stringify(error) + "\n";
+}
+
+var determineMethod = function() {
+    var methodSelect = document.getElementById("method");
+    return methodSelect.options[methodSelect.selectedIndex].text;
+}
+
+var determineInput = function(method) {
+    var rawInput = document.getElementById("input").value;
+    return rawInput === "" ? undefined : JSON.parse(rawInput);
+}
+
+var invokeHandler = function(event) {
+    var method = determineMethod();
+    var input = determineInput(method);
+    if (method === "construct") {
+        window.kcp = new KeycloakPromise(input);
+        successHandler(window.kcp);
+    } else {
+        var result;
+        if (Array.isArray(input)) {
+            result = KeycloakPromise.prototype[method].apply(window.kcp, input);
+        } else {
+            result = KeycloakPromise.prototype[method].call(window.kcp, input);
+        }
+        if (result instanceof Promise) {
+            result.then(successHandler).catch(errorHandler);
+        } else {
+            successHandler(result);
+        }
+    }
+}
+
+window.addEventListener("load", function() {
+    document.getElementById("results").value = "";
+    document.getElementById("errors").value = "";
+    document.getElementById("invoke").addEventListener("click", invokeHandler);
+    window.kcp = new KeycloakPromise();
+    window.kcp.init().then(function() {
+        document.getElementById("invoke").disabled = false;
+    }).catch(errorHandler);
+});
+        </script>
+    </head>
+    <body>
+        <div>
+            <label>Method:</label>
+            <select id="method">
+                <option>construct</option>
+                <option>accountManagement</option>
+                <option>createAccountUrl</option>
+                <option>createLoginUrl</option>
+                <option>createLogoutUrl</option>
+                <option>createRegisterUrl</option>
+                <option>hasRealmRole</option>
+                <option>hasResourceRole</option>
+                <option>init</option>
+                <option>isTokenExpired</option>
+                <option>loadUserProfile</option>
+                <option>login</option>
+                <option>logout</option>
+                <option>register</option>
+                <option>updateToken</option>
+            </select>
+            <button id="invoke" disabled="true">Invoke</button>
+        </div>
+        <div><label>Input:</label></div>
+        <div><textarea id="input" cols="78" rows="12"></textarea></div>
+        <div><label>Results:</label></div>
+        <div><textarea id="results" cols="78" rows="12"></textarea></div>
+        <div><label>Errors:</label></div>
+        <div><textarea id="errors" cols="78" rows="12"></textarea></div>
+    </body>
+</html>

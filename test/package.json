@@ -1,0 +1,20 @@
+{
+  "name": "keycloak-promise-client",
+  "version": "1.0.0",
+  "description": "Simple client for the keycloak-promise implementation",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RayDeCampo/keycloak-promise.git"
+  },
+  "author": {
+    "name": "Ray DeCampo",
+    "email": "ray@decampo.org"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}
